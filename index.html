@@ -1,0 +1,1739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Milestone - Track Your Progress</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4d9de0;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 100%;
+            padding: 20px;
+            margin: 0 auto;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 1px solid var(--border-color);
+            margin-bottom: 30px;
+        }
+
+        .logo {
+            font-size: 32px;
+            font-weight: bold;
+            color: var(--primary-color);
+            display: flex;
+            align-items: center;
+        }
+
+        .logo i {
+            margin-right: 10px;
+            color: var(--accent-color);
+        }
+
+        nav {
+            display: flex;
+            gap: 20px;
+        }
+
+        .nav-item {
+            cursor: pointer;
+            padding: 10px 15px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .nav-item:hover, .nav-item.active {
+            background-color: rgba(74, 111, 165, 0.1);
+            color: var(--primary-color);
+        }
+
+        .notification-badge {
+            position: relative;
+        }
+
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background-color: var(--danger-color);
+            color: white;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        main {
+            min-height: calc(100vh - 200px);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            font-weight: 600;
+        }
+
+        .tracks-container {
+            margin-bottom: 30px;
+        }
+
+        .track-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .btn {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(74, 111, 165, 0.1);
+        }
+
+        .track-list {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .track-item {
+            cursor: pointer;
+            padding: 15px;
+            border-radius: 8px;
+            transition: transform 0.3s;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .track-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .track-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+
+        .track-info {
+            display: flex;
+            align-items: center;
+        }
+
+        .track-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .track-actions button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .track-actions .edit:hover {
+            color: var(--info-color);
+        }
+
+        .track-actions .delete:hover {
+            color: var(--danger-color);
+        }
+
+        .milestone-container {
+            overflow-x: auto;
+            width: 100%;
+            margin: 20px 0;
+            padding-bottom: 15px;
+        }
+
+        .milestone-timeline {
+            display: flex;
+            min-width: 100%;
+            gap: 15px;
+            padding: 10px 0;
+        }
+
+        .milestone-block {
+            min-width: 180px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .milestone-block:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .milestone-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .milestone-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .milestone-time {
+            font-size: 12px;
+            color: #777;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .milestone-add {
+            min-width: 180px;
+            height: 120px;
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .milestone-add:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(74, 111, 165, 0.05);
+        }
+
+        .milestone-add i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: #999;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .color-picker {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .color-option {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .color-option:hover, .color-option.selected {
+            transform: scale(1.1);
+            box-shadow: 0 0 0 2px white, 0 0 0 4px var(--primary-color);
+        }
+
+        .importance-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .importance-level {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s;
+            opacity: 0.4;
+        }
+
+        .importance-level:hover, .importance-level.selected {
+            transform: scale(1.1);
+            opacity: 1;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .notification-list {
+            list-style: none;
+        }
+
+        .notification-item {
+            padding: 15px;
+            border-left: 4px solid;
+            background-color: white;
+            margin-bottom: 10px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .notification-item.warning {
+            border-left-color: var(--warning-color);
+        }
+
+        .notification-item.alert {
+            border-left-color: var(--danger-color);
+        }
+
+        .notification-item.info {
+            border-left-color: var(--info-color);
+        }
+
+        .notification-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .report-section {
+            margin-bottom: 30px;
+        }
+
+        .date-range {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .date-input {
+            flex: 1;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        th {
+            background-color: rgba(74, 111, 165, 0.1);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: rgba(0, 0, 0, 0.02);
+        }
+
+        .report-content {
+            margin-top: 30px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 0;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 48px;
+            margin-bottom: 15px;
+            color: #ccc;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 10px;
+            color: #666;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+
+            header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav {
+                width: 100%;
+                justify-content: space-around;
+            }
+
+            .nav-item {
+                padding: 8px 12px;
+                font-size: 14px;
+            }
+
+            .modal-content {
+                padding: 20px;
+            }
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            color: var(--text-color);
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast.success i {
+            color: var(--success-color);
+        }
+
+        .toast.error i {
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="logo">
+                <i class="fas fa-flag-checkered"></i>
+                Milestone
+            </div>
+            <nav>
+                <div class="nav-item active" data-section="tracks">Tracks</div>
+                <div class="nav-item" data-section="notifications">
+                    <div class="notification-badge">
+                        Notifications
+                        <span class="badge" id="notification-count">0</span>
+                    </div>
+                </div>
+                <div class="nav-item" data-section="reports">Reports</div>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Tracks Section -->
+            <section id="tracks-section" class="section active">
+                <div class="card">
+                    <div class="track-header">
+                        <h2>Your Tracks</h2>
+                        <button class="btn btn-primary" id="add-track-btn">
+                            <i class="fas fa-plus"></i> Add Track
+                        </button>
+                    </div>
+                    <div class="track-list" id="track-list">
+                        <!-- Tracks will be added here dynamically -->
+                        <div class="empty-state" id="empty-tracks">
+                            <i class="fas fa-route"></i>
+                            <h3>No tracks yet</h3>
+                            <p>Create a track to start documenting your milestones</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card" id="milestones-card" style="display: none;">
+                    <div class="track-header">
+                        <h2 id="selected-track-name">Track Name</h2>
+                        <button class="btn btn-outline" id="back-to-tracks">
+                            <i class="fas fa-arrow-left"></i> Back to Tracks
+                        </button>
+                    </div>
+                    <div class="milestone-container">
+                        <div class="milestone-timeline" id="milestone-timeline">
+                            <!-- Milestones will be added here dynamically -->
+                            <div class="milestone-add" id="add-milestone">
+                                <i class="fas fa-plus"></i>
+                                <span>Add Milestone</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Notifications Section -->
+            <section id="notifications-section" class="section">
+                <div class="card">
+                    <h2>Notifications</h2>
+                    <ul class="notification-list" id="notification-list">
+                        <!-- Notifications will be added here dynamically -->
+                        <div class="empty-state" id="empty-notifications">
+                            <i class="fas fa-bell-slash"></i>
+                            <h3>No notifications</h3>
+                            <p>You're all caught up!</p>
+                        </div>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Reports Section -->
+            <section id="reports-section" class="section">
+                <div class="card">
+                    <h2>Generate Progress Report</h2>
+                    <div class="report-section">
+                        <div class="date-range">
+                            <div class="date-input">
+                                <label for="report-start-date">Start Date</label>
+                                <input type="date" id="report-start-date">
+                            </div>
+                            <div class="date-input">
+                                <label for="report-end-date">End Date</label>
+                                <input type="date" id="report-end-date">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" id="generate-report-btn">
+                            <i class="fas fa-file-alt"></i> Generate Report
+                        </button>
+                    </div>
+                    <div class="report-content" id="report-content" style="display: none;">
+                        <!-- Report will be generated here -->
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Add Track Modal -->
+    <div class="modal-overlay" id="add-track-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Track</h2>
+                <button class="modal-close" id="close-track-modal">&times;</button>
+            </div>
+            <form id="add-track-form">
+                <div class="form-group">
+                    <label for="track-name">Track Name</label>
+                    <input type="text" id="track-name" placeholder="E.g., Learning French" required>
+                </div>
+                <div class="form-group">
+                    <label>Track Color</label>
+                    <div class="color-picker" id="color-picker">
+                        <div class="color-option" style="background-color: #4a6fa5;" data-color="#4a6fa5"></div>
+                        <div class="color-option" style="background-color: #e63946;" data-color="#e63946"></div>
+                        <div class="color-option" style="background-color: #2a9d8f;" data-color="#2a9d8f"></div>
+                        <div class="color-option" style="background-color: #e9c46a;" data-color="#e9c46a"></div>
+                        <div class="color-option" style="background-color: #8338ec;" data-color="#8338ec"></div>
+                        <div class="color-option" style="background-color: #fb8500;" data-color="#fb8500"></div>
+                        <div class="color-option" style="background-color: #06d6a0;" data-color="#06d6a0"></div>
+                        <div class="color-option" style="background-color: #118ab2;" data-color="#118ab2"></div>
+                    </div>
+                    <input type="hidden" id="selected-color" required>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancel-track">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-track">
+                        <span id="track-spinner" style="display: none;" class="spinner"></span>
+                        <span>Save Track</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Add Milestone Modal -->
+    <div class="modal-overlay" id="add-milestone-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Add New Milestone</h2>
+                <button class="modal-close" id="close-milestone-modal">&times;</button>
+            </div>
+            <form id="add-milestone-form">
+                <div class="form-group">
+                    <label for="milestone-title">Milestone Name</label>
+                    <input type="text" id="milestone-title" placeholder="E.g., Downloaded Duolingo" required>
+                </div>
+                <div class="form-group">
+                    <label for="milestone-date">Date</label>
+                    <input type="date" id="milestone-date" required>
+                </div>
+                <div class="form-group">
+                    <label for="milestone-time">Time Spent (hours)</label>
+                    <input type="number" id="milestone-time" step="0.5" min="0" placeholder="E.g., 3" required>
+                </div>
+                <div class="form-group">
+                    <label>Importance Level</label>
+                    <div class="importance-selector" id="importance-selector">
+                        <!-- Will be filled dynamically based on track color -->
+                    </div>
+                    <input type="hidden" id="selected-importance" required>
+                </div>
+                <div class="form-group">
+                    <label for="milestone-notes">Notes</label>
+                    <textarea id="milestone-notes" rows="4" placeholder="Add details about what you accomplished..."></textarea>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancel-milestone">Cancel</button>
+                    <button type="submit" class="btn btn-primary" id="save-milestone">
+                        <span id="milestone-spinner" style="display: none;" class="spinner"></span>
+                        <span>Save Milestone</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Operation successful!</span>
+    </div>
+
+    <!-- Firebase Scripts -->
+    <script type="module">
+        // Import Firebase modules
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getDatabase, ref, push, get, set, update, remove, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjBbnm8F76BCb9C5fluUyoZ2QnMSXlHOo",
+            authDomain: "test-c7bf3.firebaseapp.com",
+            databaseURL: "https://test-c7bf3-default-rtdb.firebaseio.com",
+            projectId: "test-c7bf3",
+            storageBucket: "test-c7bf3.firebasestorage.app",
+            messagingSenderId: "573697013702",
+            appId: "1:573697013702:web:fe132fc4d796c06bdbe4c7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // DOM Elements
+        const tracksList = document.getElementById('track-list');
+        const emptyTracks = document.getElementById('empty-tracks');
+        const addTrackBtn = document.getElementById('add-track-btn');
+        const addTrackModal = document.getElementById('add-track-modal');
+        const closeTrackModal = document.getElementById('close-track-modal');
+        const addTrackForm = document.getElementById('add-track-form');
+        const trackNameInput = document.getElementById('track-name');
+        const colorPicker = document.getElementById('color-picker');
+        const selectedColorInput = document.getElementById('selected-color');
+        const cancelTrackBtn = document.getElementById('cancel-track');
+        const trackSpinner = document.getElementById('track-spinner');
+        
+        const milestonesCard = document.getElementById('milestones-card');
+        const selectedTrackName = document.getElementById('selected-track-name');
+        const backToTracksBtn = document.getElementById('back-to-tracks');
+        const milestoneTimeline = document.getElementById('milestone-timeline');
+        const addMilestoneBtn = document.getElementById('add-milestone');
+        
+        const addMilestoneModal = document.getElementById('add-milestone-modal');
+        const closeMilestoneModal = document.getElementById('close-milestone-modal');
+        const addMilestoneForm = document.getElementById('add-milestone-form');
+        const milestoneTitleInput = document.getElementById('milestone-title');
+        const milestoneDateInput = document.getElementById('milestone-date');
+        const milestoneTimeInput = document.getElementById('milestone-time');
+        const importanceSelector = document.getElementById('importance-selector');
+        const selectedImportanceInput = document.getElementById('selected-importance');
+        const milestoneNotesInput = document.getElementById('milestone-notes');
+        const cancelMilestoneBtn = document.getElementById('cancel-milestone');
+        const milestoneSpinner = document.getElementById('milestone-spinner');
+        
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.section');
+        
+        const notificationList = document.getElementById('notification-list');
+        const emptyNotifications = document.getElementById('empty-notifications');
+        const notificationCount = document.getElementById('notification-count');
+        
+        const reportStartDate = document.getElementById('report-start-date');
+        const reportEndDate = document.getElementById('report-end-date');
+        const generateReportBtn = document.getElementById('generate-report-btn');
+        const reportContent = document.getElementById('report-content');
+        
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
+
+        // Global variables
+        let currentTrackId = null;
+        let currentTrackColor = null;
+        let tracks = {};
+        let notifications = [];
+
+        // Initialize date inputs with today's date
+        const today = new Date();
+        const formattedDate = today.toISOString().split('T')[0];
+        milestoneDateInput.value = formattedDate;
+        reportEndDate.value = formattedDate;
+        
+        // Set report start date to one month ago
+        const oneMonthAgo = new Date();
+        oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1);
+        reportStartDate.value = oneMonthAgo.toISOString().split('T')[0];
+
+        // Navigation
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                navItems.forEach(navItem => navItem.classList.remove('active'));
+                item.classList.add('active');
+                
+                const sectionId = item.dataset.section + '-section';
+                sections.forEach(section => section.classList.remove('active'));
+                document.getElementById(sectionId).classList.add('active');
+                
+                if (item.dataset.section === 'tracks') {
+                    if (currentTrackId) {
+                        showMilestones(currentTrackId);
+                    } else {
+                        loadTracks();
+                    }
+                } else if (item.dataset.section === 'notifications') {
+                    loadNotifications();
+                }
+            });
+        });
+
+        // Track Modal Handlers
+        addTrackBtn.addEventListener('click', openAddTrackModal);
+        closeTrackModal.addEventListener('click', closeAddTrackModal);
+        cancelTrackBtn.addEventListener('click', closeAddTrackModal);
+
+        function openAddTrackModal() {
+            addTrackModal.classList.add('active');
+            trackNameInput.focus();
+        }
+
+        function closeAddTrackModal() {
+            addTrackModal.classList.remove('active');
+            addTrackForm.reset();
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+            });
+        }
+
+        // Color Picker
+        colorPicker.addEventListener('click', (e) => {
+            if (e.target.classList.contains('color-option')) {
+                document.querySelectorAll('.color-option').forEach(option => {
+                    option.classList.remove('selected');
+                });
+                e.target.classList.add('selected');
+                selectedColorInput.value = e.target.dataset.color;
+            }
+        });
+
+        // Add Track Form Submit
+        addTrackForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const trackName = trackNameInput.value.trim();
+            const trackColor = selectedColorInput.value;
+            
+            if (!trackName || !trackColor) {
+                showToast('Please fill in all fields', 'error');
+                
+                return;
+            }
+            
+            trackSpinner.style.display = 'inline-block';
+            
+            try {
+                // Save track to Firebase
+                const tracksRef = ref(database, 'milestones/tracks');
+                const newTrackRef = push(tracksRef);
+                await set(newTrackRef, {
+                    name: trackName,
+                    color: trackColor,
+                    createdAt: new Date().toISOString()
+                });
+                
+                showToast('Track created successfully!', 'success');
+                closeAddTrackModal();
+                loadTracks();
+            } catch (error) {
+                console.error('Error creating track:', error);
+                showToast('Failed to create track', 'error');
+            } finally {
+                trackSpinner.style.display = 'none';
+            }
+        });
+
+        // Back to Tracks
+        backToTracksBtn.addEventListener('click', () => {
+            currentTrackId = null;
+            milestonesCard.style.display = 'none';
+            loadTracks();
+        });
+
+        // Milestone Modal Handlers
+        addMilestoneBtn.addEventListener('click', openAddMilestoneModal);
+        closeMilestoneModal.addEventListener('click', closeAddMilestoneModal);
+        cancelMilestoneBtn.addEventListener('click', closeAddMilestoneModal);
+
+        function openAddMilestoneModal() {
+            addMilestoneModal.classList.add('active');
+            
+            // Create importance levels based on track color
+            importanceSelector.innerHTML = '';
+            if (currentTrackColor) {
+                const color = currentTrackColor;
+                
+                // Create 5 importance levels with varying opacity
+                for (let i = 1; i <= 5; i++) {
+                    const level = document.createElement('div');
+                    level.classList.add('importance-level');
+                    
+                    // Create hex with opacity
+                    const hexToRgb = (hex) => {
+                        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                        return result ? {
+                            r: parseInt(result[1], 16),
+                            g: parseInt(result[2], 16),
+                            b: parseInt(result[3], 16)
+                        } : null;
+                    };
+                    
+                    const rgb = hexToRgb(color);
+                    // Set opacity from 0.2 to 1.0
+                    const opacity = 0.2 + (i - 1) * 0.2;
+                    level.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity})`;
+                    
+                    level.dataset.level = i;
+                    level.addEventListener('click', () => {
+                        document.querySelectorAll('.importance-level').forEach(opt => {
+                            opt.classList.remove('selected');
+                        });
+                        level.classList.add('selected');
+                        selectedImportanceInput.value = i;
+                    });
+                    
+                    importanceSelector.appendChild(level);
+                }
+                
+                // Select middle level by default
+                const defaultLevel = document.querySelector('.importance-level[data-level="3"]');
+                if (defaultLevel) {
+                    defaultLevel.click();
+                }
+            }
+            
+            milestoneTitleInput.focus();
+        }
+
+        function closeAddMilestoneModal() {
+            addMilestoneModal.classList.remove('active');
+            addMilestoneForm.reset();
+            milestoneDateInput.value = formattedDate;
+            document.querySelectorAll('.importance-level').forEach(option => {
+                option.classList.remove('selected');
+            });
+        }
+
+        // Add Milestone Form Submit
+        addMilestoneForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const milestoneTitle = milestoneTitleInput.value.trim();
+            const milestoneDate = milestoneDateInput.value;
+            const milestoneTime = parseFloat(milestoneTimeInput.value);
+            const importanceLevel = parseInt(selectedImportanceInput.value);
+            const milestoneNotes = milestoneNotesInput.value.trim();
+            
+            if (!milestoneTitle || !milestoneDate || isNaN(milestoneTime) || !importanceLevel) {
+                showToast('Please fill in all required fields', 'error');
+                return;
+            }
+            
+            milestoneSpinner.style.display = 'inline-block';
+            
+            try {
+                // Save milestone to Firebase
+                const milestonesRef = ref(database, `milestones/trackMilestones/${currentTrackId}`);
+                const newMilestoneRef = push(milestonesRef);
+                await set(newMilestoneRef, {
+                    title: milestoneTitle,
+                    date: milestoneDate,
+                    time: milestoneTime,
+                    importance: importanceLevel,
+                    notes: milestoneNotes,
+                    createdAt: new Date().toISOString()
+                });
+                
+                // Update last activity date for bottleneck tracking
+                const trackRef = ref(database, `milestones/tracks/${currentTrackId}`);
+                await update(trackRef, {
+                    lastActivityDate: milestoneDate,
+                    lastActivityImportance: importanceLevel
+                });
+                
+                showToast('Milestone added successfully!', 'success');
+                closeAddMilestoneModal();
+                showMilestones(currentTrackId);
+                checkBottlenecks(); // Update bottleneck notifications
+            } catch (error) {
+                console.error('Error adding milestone:', error);
+                showToast('Failed to add milestone', 'error');
+            } finally {
+                milestoneSpinner.style.display = 'none';
+            }
+        });
+
+        // Generate Report
+        generateReportBtn.addEventListener('click', async () => {
+            const startDate = reportStartDate.value;
+            const endDate = reportEndDate.value;
+            
+            if (!startDate || !endDate) {
+                showToast('Please select date range', 'error');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                showToast('Start date cannot be after end date', 'error');
+                return;
+            }
+            
+            try {
+                reportContent.innerHTML = '<div class="empty-state"><i class="fas fa-spinner fa-spin"></i><h3>Generating report...</h3></div>';
+                reportContent.style.display = 'block';
+                
+                // Fetch all tracks
+                const tracksSnapshot = await get(ref(database, 'milestones/tracks'));
+                if (!tracksSnapshot.exists()) {
+                    reportContent.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-circle"></i><h3>No tracks available</h3></div>';
+                    return;
+                }
+                
+                const tracksData = tracksSnapshot.val();
+                const tracksArray = Object.keys(tracksData).map(key => ({
+                    id: key,
+                    ...tracksData[key]
+                }));
+                
+                // Create HTML for the report
+                let reportHTML = `
+                    <h3>Progress Report (${startDate} to ${endDate})</h3>
+                    <h4>Track Summary</h4>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Track #</th>
+                                <th>Track Name</th>
+                                <th>Total Hours</th>
+                                <th>Milestones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                `;
+                
+                let trackMilestonesHTML = '';
+                let trackTimeHTML = '';
+                let totalHours = 0;
+                let totalMilestones = 0;
+                
+                // Process each track
+                for (let i = 0; i < tracksArray.length; i++) {
+                    const track = tracksArray[i];
+                    const trackNum = i + 1;
+                    
+                    // Fetch milestones for this track
+                    const milestonesRef = ref(database, `milestones/trackMilestones/${track.id}`);
+                    const milestonesSnapshot = await get(milestonesRef);
+                    
+                    if (milestonesSnapshot.exists()) {
+                        const milestonesData = milestonesSnapshot.val();
+                        const milestonesArray = Object.keys(milestonesData)
+                            .map(key => ({
+                                id: key,
+                                ...milestonesData[key]
+                            }))
+                            .filter(milestone => {
+                                const milestoneDate = new Date(milestone.date);
+                                return milestoneDate >= new Date(startDate) && 
+                                       milestoneDate <= new Date(endDate);
+                            })
+                            .sort((a, b) => new Date(a.date) - new Date(b.date));
+                        
+                        // Calculate track statistics
+                        const trackHours = milestonesArray.reduce((sum, milestone) => sum + milestone.time, 0);
+                        const trackMilestoneCount = milestonesArray.length;
+                        
+                        totalHours += trackHours;
+                        totalMilestones += trackMilestoneCount;
+                        
+                        // Add to track summary table
+                        reportHTML += `
+                            <tr>
+                                <td>${trackNum}</td>
+                                <td>${track.name}</td>
+                                <td>${trackHours.toFixed(1)}</td>
+                                <td>${trackMilestoneCount}</td>
+                            </tr>
+                        `;
+                        
+                        // Generate milestones section
+                        if (milestonesArray.length > 0) {
+                            trackMilestonesHTML += `<h4>Track ${trackNum}: ${track.name}</h4><ul>`;
+                            
+                            milestonesArray.forEach((milestone, idx) => {
+                                trackMilestonesHTML += `
+                                    <li>
+                                        <strong>${trackNum}.${idx + 1} ${milestone.title}</strong> (${milestone.date}, ${milestone.time} hours)
+                                        ${milestone.notes ? '<p>' + milestone.notes + '</p>' : ''}
+                                    </li>
+                                `;
+                            });
+                            
+                            trackMilestonesHTML += '</ul>';
+                            
+                            // Generate time tracking table
+                            trackTimeHTML += `
+                                <h5>Track ${trackNum}: ${track.name}</h5>
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Milestone</th>
+                                            <th>Date</th>
+                                            <th>Hours</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                            `;
+                            
+                            milestonesArray.forEach((milestone, idx) => {
+                                trackTimeHTML += `
+                                    <tr>
+                                        <td>${trackNum}.${idx + 1} ${milestone.title}</td>
+                                        <td>${milestone.date}</td>
+                                        <td>${milestone.time}</td>
+                                    </tr>
+                                `;
+                            });
+                            
+                            trackTimeHTML += '</tbody></table>';
+                        }
+                    } else {
+                        // No milestones for this track in the date range
+                        reportHTML += `
+                            <tr>
+                                <td>${trackNum}</td>
+                                <td>${track.name}</td>
+                                <td>0</td>
+                                <td>0</td>
+                            </tr>
+                        `;
+                    }
+                }
+                
+                // Finish the track summary table
+                reportHTML += `
+                        <tr>
+                            <td colspan="2"><strong>Total</strong></td>
+                            <td><strong>${totalHours.toFixed(1)}</strong></td>
+                            <td><strong>${totalMilestones}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>`;
+                
+                // Add milestone details
+                if (trackMilestonesHTML) {
+                    reportHTML += `
+                        <h4>Milestone Details</h4>
+                        ${trackMilestonesHTML}
+                    `;
+                }
+                
+                // Add time tracking tables
+                if (trackTimeHTML) {
+                    reportHTML += `
+                        <h4>Time Tracking</h4>
+                        ${trackTimeHTML}
+                    `;
+                }
+                
+                // If no milestones found in the date range
+                if (totalMilestones === 0) {
+                    reportHTML += `
+                        <div class="empty-state">
+                            <i class="fas fa-calendar-times"></i>
+                            <h3>No milestones found</h3>
+                            <p>No progress recorded in the selected date range</p>
+                        </div>
+                    `;
+                }
+                
+                // Add download button
+                reportHTML += `
+                    <div style="margin-top: 20px; text-align: right;">
+                        <button class="btn btn-primary" id="download-report">
+                            <i class="fas fa-download"></i> Download Report
+                        </button>
+                    </div>
+                `;
+                
+                reportContent.innerHTML = reportHTML;
+                
+                // Add download functionality
+                document.getElementById('download-report').addEventListener('click', () => {
+                    const reportTitle = `Milestone_Report_${startDate}_to_${endDate}`;
+                    downloadReport(reportContent.innerHTML, reportTitle);
+                });
+                
+            } catch (error) {
+                console.error('Error generating report:', error);
+                reportContent.innerHTML = '<div class="empty-state"><i class="fas fa-exclamation-triangle"></i><h3>Failed to generate report</h3></div>';
+            }
+        });
+
+        // Download Report as HTML
+        function downloadReport(content, filename) {
+            const htmlContent = `
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>${filename}</title>
+                    <meta charset="UTF-8">
+                    <style>
+                        body { font-family: Arial, sans-serif; line-height: 1.6; padding: 20px; }
+                        h3, h4, h5 { color: #4a6fa5; }
+                        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                        th, td { padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+                        th { background-color: #f2f2f2; }
+                        ul { padding-left: 20px; }
+                        li { margin-bottom: 10px; }
+                    </style>
+                </head>
+                <body>
+                    <h2>Milestone Progress Report</h2>
+                    ${content}
+                </body>
+                </html>
+            `;
+            
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${filename}.html`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Load Tracks
+        async function loadTracks() {
+            try {
+                const tracksRef = ref(database, 'milestones/tracks');
+                const tracksSnapshot = await get(tracksRef);
+                
+                if (tracksSnapshot.exists()) {
+                    const tracksData = tracksSnapshot.val();
+                    tracks = tracksData;
+                    
+                    tracksList.innerHTML = '';
+                    
+                    Object.keys(tracksData).forEach(trackId => {
+                        const track = tracksData[trackId];
+                        const trackItem = document.createElement('div');
+                        trackItem.className = 'track-item';
+                        trackItem.innerHTML = `
+                            <div class="track-info">
+                                <div class="track-color" style="background-color: ${track.color};"></div>
+                                <div>${track.name}</div>
+                            </div>
+                            <div class="track-actions">
+                                <button class="edit" title="Edit Track"><i class="fas fa-edit"></i></button>
+                                <button class="delete" title="Delete Track"><i class="fas fa-trash"></i></button>
+                            </div>
+                        `;
+                        
+                        // Open track's milestones when clicked
+                        trackItem.addEventListener('click', (e) => {
+                            if (!e.target.closest('.track-actions')) {
+                                showMilestones(trackId);
+                            }
+                        });
+                        
+                        // Handle edit button
+                        trackItem.querySelector('.edit').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            editTrack(trackId);
+                        });
+                        
+                        // Handle delete button
+                        trackItem.querySelector('.delete').addEventListener('click', (e) => {
+                            e.stopPropagation();
+                            deleteTrack(trackId);
+                        });
+                        
+                        tracksList.appendChild(trackItem);
+                    });
+                    
+                    emptyTracks.style.display = 'none';
+                } else {
+                    tracksList.innerHTML = '';
+                    emptyTracks.style.display = 'block';
+                }
+                
+                // Check for bottlenecks
+                checkBottlenecks();
+                
+            } catch (error) {
+                console.error('Error loading tracks:', error);
+                showToast('Failed to load tracks', 'error');
+            }
+        }
+
+        // Show Milestones for a track
+        async function showMilestones(trackId) {
+            currentTrackId = trackId;
+            const track = tracks[trackId];
+            
+            if (!track) {
+                showToast('Track not found', 'error');
+                return;
+            }
+            
+            selectedTrackName.textContent = track.name;
+            currentTrackColor = track.color;
+            
+            try {
+                // Fetch milestones
+                const milestonesRef = ref(database, `milestones/trackMilestones/${trackId}`);
+                const milestonesSnapshot = await get(milestonesRef);
+                
+                // Clear timeline except add button
+                const addMilestoneElement = milestoneTimeline.querySelector('#add-milestone');
+                milestoneTimeline.innerHTML = '';
+                milestoneTimeline.appendChild(addMilestoneElement);
+                
+                if (milestonesSnapshot.exists()) {
+                    const milestonesData = milestonesSnapshot.val();
+                    
+                    // Convert to array and sort by date
+                    const milestonesArray = Object.keys(milestonesData)
+                        .map(key => ({
+                            id: key,
+                            ...milestonesData[key]
+                        }))
+                        .sort((a, b) => new Date(a.date) - new Date(b.date));
+                    
+                    // Add milestones to timeline
+                    milestonesArray.forEach(milestone => {
+                        const milestoneElement = createMilestoneElement(milestone, track.color);
+                        milestoneTimeline.insertBefore(milestoneElement, addMilestoneElement);
+                    });
+                }
+                
+                milestonesCard.style.display = 'block';
+                
+            } catch (error) {
+                console.error('Error fetching milestones:', error);
+                showToast('Failed to load milestones', 'error');
+            }
+        }
+
+        // Create milestone element
+        function createMilestoneElement(milestone, trackColor) {
+            const milestoneElement = document.createElement('div');
+            milestoneElement.className = 'milestone-block';
+            
+            // Convert hex to rgba for importance level
+            const hexToRgb = (hex) => {
+                const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+                return result ? {
+                    r: parseInt(result[1], 16),
+                    g: parseInt(result[2], 16),
+                    b: parseInt(result[3], 16)
+                } : null;
+            };
+            
+            const rgb = hexToRgb(trackColor);
+            const opacity = 0.2 + (milestone.importance - 1) * 0.2;
+            
+            // Add border and background color
+            milestoneElement.style.borderLeft = `4px solid ${trackColor}`;
+            milestoneElement.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity * 0.3})`;
+            
+            // Format date
+            const date = new Date(milestone.date);
+            const formattedDate = date.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric' 
+            });
+            
+            milestoneElement.innerHTML = `
+                <div class="milestone-date">${formattedDate}</div>
+                <div class="milestone-title">${milestone.title}</div>
+                <div class="milestone-time">
+                    <i class="far fa-clock"></i> ${milestone.time} hours
+                </div>
+            `;
+            
+            // Show notes in tooltip on hover
+            if (milestone.notes) {
+                milestoneElement.title = milestone.notes;
+            }
+            
+            // Edit milestone on click
+            milestoneElement.addEventListener('click', () => {
+                editMilestone(milestone.id);
+            });
+            
+            return milestoneElement;
+        }
+
+        // Edit Track
+        function editTrack(trackId) {
+            const track = tracks[trackId];
+            if (!track) return;
+            
+            // Populate form
+            trackNameInput.value = track.name;
+            
+            // Select color
+            document.querySelectorAll('.color-option').forEach(option => {
+                option.classList.remove('selected');
+                if (option.dataset.color === track.color) {
+                    option.classList.add('selected');
+                    selectedColorInput.value = track.color;
+                }
+            });
+            
+            // If no color matched, select the first one
+            if (!selectedColorInput.value) {
+                const firstColorOption = document.querySelector('.color-option');
+                if (firstColorOption) {
+                    firstColorOption.classList.add('selected');
+                    selectedColorInput.value = firstColorOption.dataset.color;
+                }
+            }
+            
+            // Change form submit handler
+            const saveTrackBtn = document.getElementById('save-track');
+            saveTrackBtn.textContent = 'Update Track';
+            
+            // Save the original form submit handler
+            const originalHandler = addTrackForm.onsubmit;
+            
+            // Set new handler
+            addTrackForm.onsubmit = async (e) => {
+                e.preventDefault();
+                
+                const trackName = trackNameInput.value.trim();
+                const trackColor = selectedColorInput.value;
+                
+                if (!trackName || !trackColor) {
+                    showToast('Please fill in all fields', 'error');
+                    return;
+                }
+                
+                trackSpinner.style.display = 'inline-block';
+                
+                try {
+                    // Update track in Firebase
+                    const trackRef = ref(database, `milestones/tracks/${trackId}`);
+                    await update(trackRef, {
+                        name: trackName,
+                        color: trackColor,
+                        updatedAt: new Date().toISOString()
+                    });
+                    
+                    showToast('Track updated successfully!', 'success');
+                    closeAddTrackModal();
+                    loadTracks();
+                } catch (error) {
+                    console.error('Error updating track:', error);
+                    showToast('Failed to update track', 'error');
+                } finally {
+                    trackSpinner.style.display = 'none';
+                    // Restore original handler
+                    addTrackForm.onsubmit = originalHandler;
+                }
+            };
+            
+            // When modal is closed, restore original handler
+            const modalCloseHandler = () => {
+                addTrackForm.onsubmit = originalHandler;
+                saveTrackBtn.textContent = 'Save Track';
+                closeTrackModal.removeEventListener('click', modalCloseHandler);
+                cancelTrackBtn.removeEventListener('click', modalCloseHandler);
+            };
+            
+            closeTrackModal.addEventListener('click', modalCloseHandler);
+            cancelTrackBtn.addEventListener('click', modalCloseHandler);
+            
+            // Open modal
+            openAddTrackModal();
+        }
+
+        // Delete Track
+        async function deleteTrack(trackId) {
+            if (confirm('Are you sure you want to delete this track and all its milestones? This action cannot be undone.')) {
+                try {
+                    // Delete track and its milestones
+                    await remove(ref(database, `milestones/tracks/${trackId}`));
+                    await remove(ref(database, `milestones/trackMilestones/${trackId}`));
+                    
+                    showToast('Track deleted successfully', 'success');
+                    
+                    // If we were viewing this track's milestones, go back to track list
+                    if (currentTrackId === trackId) {
+                        currentTrackId = null;
+                        milestonesCard.style.display = 'none';
+                    }
+                    
+                    loadTracks();
+                    
+                } catch (error) {
+                    console.error('Error deleting track:', error);
+                    showToast('Failed to delete track', 'error');
+                }
+            }
+        }
+
+        // Edit Milestone
+        function editMilestone(milestoneId) {
+            // TODO: Implement milestone editing
+            showToast('Milestone editing coming soon', 'info');
+        }
+
+        // Check for bottlenecks
+        async function checkBottlenecks() {
+            try {
+                const tracksRef = ref(database, 'milestones/tracks');
+                const tracksSnapshot = await get(tracksRef);
+                
+                if (!tracksSnapshot.exists()) {
+                    return;
+                }
+                
+                const tracksData = tracksSnapshot.val();
+                const today = new Date();
+                const bottlenecks = [];
+                
+                Object.keys(tracksData).forEach(trackId => {
+                    const track = tracksData[trackId];
+                    
+                    if (track.lastActivityDate) {
+                        const lastActivity = new Date(track.lastActivityDate);
+                        const daysSinceActivity = Math.floor((today - lastActivity) / (1000 * 60 * 60 * 24));
+                        
+                        // Check for bottlenecks based on days of inactivity or low importance
+                        const isLowImportance = track.lastActivityImportance === 1; // Lowest importance level
+                        
+                        if (daysSinceActivity >= 14 || (daysSinceActivity >= 10 && isLowImportance)) {
+                            // Red alert - 2 weeks inactive or 10+ days with low progress
+                            bottlenecks.push({
+                                trackId,
+                                trackName: track.name,
+                                days: daysSinceActivity,
+                                level: 'alert',
+                                message: `No significant progress for ${daysSinceActivity} days`
+                            });
+                        } else if (daysSinceActivity >= 7 || (daysSinceActivity >= 5 && isLowImportance)) {
+                            // Orange warning - 1 week inactive or 5+ days with low progress
+                            bottlenecks.push({
+                                trackId,
+                                trackName: track.name,
+                                days: daysSinceActivity,
+                                level: 'warning',
+                                message: `Limited activity for ${daysSinceActivity} days`
+                            });
+                        } else if (daysSinceActivity >= 3 || (daysSinceActivity >= 2 && isLowImportance)) {
+                            // Yellow notice - 3 days inactive or 2+ days with low progress
+                            bottlenecks.push({
+                                trackId,
+                                trackName: track.name,
+                                days: daysSinceActivity,
+                                level: 'info',
+                                message: `Activity stalling for ${daysSinceActivity} days`
+                            });
+                        }
+                    }
+                });
+                
+                // Store notifications and update badge
+                notifications = bottlenecks;
+                updateNotificationBadge();
+                
+            } catch (error) {
+                console.error('Error checking bottlenecks:', error);
+            }
+        }
+
+        // Load Notifications
+        function loadNotifications() {
+            if (notifications.length === 0) {
+                notificationList.innerHTML = '';
+                emptyNotifications.style.display = 'block';
+                return;
+            }
+            
+            notificationList.innerHTML = '';
+            emptyNotifications.style.display = 'none';
+            
+            // Sort notifications by level (alert > warning > info)
+            const sortedNotifications = [...notifications].sort((a, b) => {
+                const levelOrder = { alert: 3, warning: 2, info: 1 };
+                return levelOrder[b.level] - levelOrder[a.level];
+            });
+            
+            sortedNotifications.forEach(notification => {
+                const notificationItem = document.createElement('li');
+                notificationItem.className = `notification-item ${notification.level}`;
+                
+                const iconMap = {
+                    alert: 'fa-exclamation-circle',
+                    warning: 'fa-exclamation-triangle',
+                    info: 'fa-info-circle'
+                };
+                
+                notificationItem.innerHTML = `
+                    <div class="notification-title">
+                        <i class="fas ${iconMap[notification.level]}"></i>
+                        ${notification.trackName}
+                    </div>
+                    <div class="notification-message">${notification.message}</div>
+                    <button class="btn btn-outline btn-sm open-track" data-track-id="${notification.trackId}">
+                        Update Track
+                    </button>
+                `;
+                
+                notificationItem.querySelector('.open-track').addEventListener('click', () => {
+                    // Navigate to track and show milestones
+                    document.querySelector('.nav-item[data-section="tracks"]').click();
+                    showMilestones(notification.trackId);
+                });
+                
+                notificationList.appendChild(notificationItem);
+            });
+        }
+
+        // Update notification badge
+        function updateNotificationBadge() {
+            const count = notifications.length;
+            notificationCount.textContent = count;
+            notificationCount.style.display = count > 0 ? 'flex' : 'none';
+        }
+
+        // Show toast message
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            
+            // Update icon
+            const icon = toast.querySelector('i');
+            if (type === 'success') {
+                icon.className = 'fas fa-check-circle';
+            } else if (type === 'error') {
+                icon.className = 'fas fa-times-circle';
+            } else {
+                icon.className = 'fas fa-info-circle';
+            }
+            
+            toast.classList.add('active');
+            
+            setTimeout(() => {
+                toast.classList.remove('active');
+            }, 3000);
+        }
+
+        // Initialize app
+        loadTracks();
+    </script>
+</body>
+</html>
