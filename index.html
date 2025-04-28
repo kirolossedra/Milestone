@@ -100,22 +100,20 @@
         a:hover {
             text-decoration: underline;
         }
-        .error-message {
+        .message {
             text-align: center;
-            background: #f8d7da;
-            padding: 15px;
+            padding: 10px;
             border-radius: 8px;
-            color: #721c24;
             margin-bottom: 20px;
             display: none;
         }
-        .success-message {
-            text-align: center;
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+        .message.success {
             background: #d4edda;
-            padding: 15px;
-            border-radius: 8px;
             color: #155724;
-            margin-bottom: 20px;
         }
         .hidden {
             display: none;
@@ -125,9 +123,9 @@
 <body>
     <div class="container">
         <div id="auth-section">
-            <div id="error-message" class="error-message"></div>
             <div id="login-form">
                 <h2>Login</h2>
+                <div id="login-message" class="message"></div>
                 <div class="input-box">
                     <input type="email" id="login-email" placeholder=" " required>
                     <label>Email</label>
@@ -141,6 +139,7 @@
             </div>
             <div id="register-form" class="hidden">
                 <h2>Register</h2>
+                <div id="register-message" class="message"></div>
                 <div class="input-box">
                     <input type="text" id="register-username" placeholder=" " required>
                     <label>Username</label>
@@ -169,7 +168,7 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getDatabase, ref, push, get, set, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        import { getDatabase, ref, push, get, set } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
 
         // Firebase configuration
         const firebaseConfig = {
@@ -189,19 +188,22 @@
         // DOM Elements
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
-        const errorMessage = document.getElementById('error-message');
+        const loginMessage = document.getElementById('login-message');
+        const registerMessage = document.getElementById('register-message');
 
-        // Show/Hide functions
+        // Show/Hide functions with message clearing
         function showLogin() {
             loginForm.classList.remove('hidden');
             registerForm.classList.add('hidden');
-            errorMessage.style.display = 'none';
+            loginMessage.textContent = '';
+            loginMessage.style.display = 'none';
         }
 
         function showRegister() {
             registerForm.classList.remove('hidden');
             loginForm.classList.add('hidden');
-            errorMessage.style.display = 'none';
+            registerMessage.textContent = '';
+            registerMessage.style.display = 'none';
         }
 
         // Event listeners for toggling forms
@@ -217,72 +219,37 @@
 
         // Register
         document.getElementById('register-btn').addEventListener('click', async () => {
-            const username = document.getElementById('register-username').value.trim();
             const email = document.getElementById('register-email').value.trim();
-            const birthdate = document.getElementById('register-birthdate').value;
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
 
-            // Validations
-            if (!username || !email || !birthdate || !password || !confirmPassword) {
-                showMessage('All fields are required');
+            if (!email || !password || !confirmPassword) {
+                showMessage(registerMessage, 'All fields are required');
                 return;
             }
             if (password !== confirmPassword) {
-                showMessage('Passwords do not match');
-                return;
-            }
-            if (password.length < 6) {
-                showMessage('Password must be at least 6 characters');
-                return;
-            }
-            if (!/\S+@\S+\.\S+/.test(email)) {
-                showMessage('Invalid email format');
-                return;
-            }
-            if (username.length < 3) {
-                showMessage('Username must be at least 3 characters');
-                return;
-            }
-            const birthDateObj = new Date(birthdate);
-            const today = new Date();
-            if (birthDateObj >= today) {
-                showMessage('Birthdate must be in the past');
+                showMessage(registerMessage, 'Passwords do not match');
                 return;
             }
 
             try {
-                // Check if email already exists
-                const usersQuery = query(ref(database, 'users'), orderByChild('email'), equalTo(email));
-                const emailSnapshot = await get(usersQuery);
-                if (emailSnapshot.exists()) {
-                    showMessage('Email already registered');
-                    return;
-                }
-
-                // Assign authority based on number of users
                 const usersRef = ref(database, 'users');
                 const usersSnapshot = await get(usersRef);
                 const authority = usersSnapshot.exists() ? usersSnapshot.numChildren() + 1 : 1;
 
-                // Store user data
                 const newUserRef = push(usersRef);
                 await set(newUserRef, {
-                    username,
                     email,
-                    birthdate,
-                    password, // Note: Storing passwords in plain text as per first code (insecure)
+                    password,
                     authority,
                     createdAt: new Date().toISOString()
                 });
 
-                // Reset form and switch to login with success message
+                showMessage(registerMessage, 'Registration successful! You can now login.', false);
                 registerForm.reset();
-                showLogin();
-                showMessage('Registration successful! Please login.', false);
             } catch (error) {
                 console.error(error);
-                showMessage('Registration failed: ' + error.message);
+                showMessage(registerMessage, 'Registration failed: ' + error.message);
             }
         });
 
@@ -292,45 +259,45 @@
             const password = document.getElementById('login-password').value;
 
             if (!email || !password) {
-                showMessage('Email and password are required');
+                showMessage(loginMessage, 'Email and password are required');
                 return;
             }
 
             try {
-                const usersQuery = query(ref(database, 'users'), orderByChild('email'), equalTo(email));
-                const snapshot = await get(usersQuery);
+                const usersRef = ref(database, 'users');
+                const snapshot = await get(usersRef);
                 if (snapshot.exists()) {
                     let userFound = false;
                     snapshot.forEach(child => {
                         const user = child.val();
-                        if (user.password === password) {
+                        if (user.email === email && user.password === password) {
                             userFound = true;
                             if (user.authority === 1) {
                                 window.location.href = 'kilostone.html';
                             } else {
-                                showMessage('Access denied: insufficient authority level.');
+                                showMessage(loginMessage, 'Access denied: insufficient authority.');
                             }
                         }
                     });
                     if (!userFound) {
-                        showMessage('Login failed: incorrect password.');
+                        showMessage(loginMessage, 'Login failed: incorrect email or password.');
                     }
                 } else {
-                    showMessage('Login failed: email not found.');
+                    showMessage(loginMessage, 'No users found.');
                 }
             } catch (error) {
                 console.error(error);
-                showMessage('Login error: ' + error.message);
+                showMessage(loginMessage, 'Login error: ' + error.message);
             }
         });
 
         // Utility function to show messages
-        function showMessage(message, isError = true) {
-            errorMessage.textContent = message;
-            errorMessage.className = isError ? 'error-message' : 'success-message';
-            errorMessage.style.display = 'block';
+        function showMessage(element, message, isError = true) {
+            element.textContent = message;
+            element.className = isError ? 'message error' : 'message success';
+            element.style.display = 'block';
             setTimeout(() => {
-                errorMessage.style.display = 'none';
+                element.style.display = 'none';
             }, 3000);
         }
     </script>
