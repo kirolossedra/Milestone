@@ -776,8 +776,7 @@
         <i class="fas fa-check-circle"></i>
         <span id="toast-message">Operation successful!</span>
     </div>
-
-    <script type="module">
+<script type="module">
     // Import Firebase modules
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
     import { getDatabase, ref, push, get, set, update, remove, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
@@ -848,7 +847,7 @@
     let currentTrackColor = null;
     let tracks = {};
     let notifications = [];
-    let editingMilestoneId = null; // New variable to track editing mode
+    let editingMilestoneId = null;
 
     // Initialize date inputs with today's date
     const today = new Date();
@@ -912,22 +911,17 @@
         }
     });
 
-    // Add Track Form Submit
-    addTrackForm.addEventListener('submit', async (e) => {
+    // Add Track Submit Handler
+    const addTrackSubmit = async (e) => {
         e.preventDefault();
-        
         const trackName = trackNameInput.value.trim();
         const trackColor = selectedColorInput.value;
-        
         if (!trackName || !trackColor) {
             showToast('Please fill in all fields', 'error');
             return;
         }
-        
         trackSpinner.style.display = 'inline-block';
-        
         try {
-            // Save track to Firebase
             const tracksRef = ref(database, 'milestones/tracks');
             const newTrackRef = push(tracksRef);
             await set(newTrackRef, {
@@ -935,7 +929,6 @@
                 color: trackColor,
                 createdAt: new Date().toISOString()
             });
-            
             showToast('Track created successfully!', 'success');
             closeAddTrackModal();
             loadTracks();
@@ -945,7 +938,10 @@
         } finally {
             trackSpinner.style.display = 'none';
         }
-    });
+    };
+
+    // Initially add the submit handler for adding tracks
+    addTrackForm.addEventListener('submit', addTrackSubmit);
 
     // Back to Tracks
     backToTracksBtn.addEventListener('click', () => {
@@ -1453,7 +1449,9 @@
         milestoneElement.style.borderLeft = `4px solid ${trackColor}`;
         milestoneElement.style.backgroundColor = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${opacity * 0.3})`;
         
-        const date = new Date(milestone.date);
+        // Fix for date display: Parse date as local date
+        const [year, month, day] = milestone.date.split('-').map(Number);
+        const date = new Date(year, month - 1, day);
         const formattedDate = date.toLocaleDateString('en-US', { 
             year: 'numeric', 
             month: 'short', 
@@ -1519,21 +1517,19 @@
         const saveTrackBtn = document.getElementById('save-track');
         saveTrackBtn.textContent = 'Update Track';
         
-        const originalHandler = addTrackForm.onsubmit;
+        // Remove the add submit handler
+        addTrackForm.removeEventListener('submit', addTrackSubmit);
         
-        addTrackForm.onsubmit = async (e) => {
+        // Define the edit submit handler
+        const editTrackSubmit = async (e) => {
             e.preventDefault();
-            
             const trackName = trackNameInput.value.trim();
             const trackColor = selectedColorInput.value;
-            
             if (!trackName || !trackColor) {
                 showToast('Please fill in all fields', 'error');
                 return;
             }
-            
             trackSpinner.style.display = 'inline-block';
-            
             try {
                 const trackRef = ref(database, `milestones/tracks/${trackId}`);
                 await update(trackRef, {
@@ -1541,7 +1537,6 @@
                     color: trackColor,
                     updatedAt: new Date().toISOString()
                 });
-                
                 showToast('Track updated successfully!', 'success');
                 closeAddTrackModal();
                 loadTracks();
@@ -1550,19 +1545,27 @@
                 showToast('Failed to update track', 'error');
             } finally {
                 trackSpinner.style.display = 'none';
-                addTrackForm.onsubmit = originalHandler;
+                // Remove the edit handler and add back the add handler
+                addTrackForm.removeEventListener('submit', editTrackSubmit);
+                addTrackForm.addEventListener('submit', addTrackSubmit);
+                saveTrackBtn.textContent = 'Save Track';
             }
         };
         
-        const modalCloseHandler = () => {
-            addTrackForm.onsubmit = originalHandler;
+        // Add the edit submit handler
+        addTrackForm.addEventListener('submit', editTrackSubmit);
+        
+        // When closing or canceling, restore the add handler
+        const restoreAddHandler = () => {
+            addTrackForm.removeEventListener('submit', editTrackSubmit);
+            addTrackForm.addEventListener('submit', addTrackSubmit);
             saveTrackBtn.textContent = 'Save Track';
-            closeTrackModal.removeEventListener('click', modalCloseHandler);
-            cancelTrackBtn.removeEventListener('click', modalCloseHandler);
+            closeTrackModal.removeEventListener('click', restoreAddHandler);
+            cancelTrackBtn.removeEventListener('click', restoreAddHandler);
         };
         
-        closeTrackModal.addEventListener('click', modalCloseHandler);
-        cancelTrackBtn.addEventListener('click', modalCloseHandler);
+        closeTrackModal.addEventListener('click', restoreAddHandler);
+        cancelTrackBtn.addEventListener('click', restoreAddHandler);
         
         openAddTrackModal();
     }
@@ -1582,7 +1585,7 @@
                 }
                 
                 loadTracks();
-                checkBottlenecks(); // Update notifications
+                checkBottlenecks();
             } catch (error) {
                 console.error('Error deleting track:', error);
                 showToast('Failed to delete track', 'error');
