@@ -4,188 +4,361 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Register</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
+        :root {
+            --primary-color: #4a6fa5;
+            --secondary-color: #166088;
+            --accent-color: #4d9de0;
+            --background-color: #f8f9fa;
+            --card-background: #ffffff;
+            --text-color: #333333;
+            --border-color: #e0e0e0;
+            --success-color: #28a745;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
+
         body {
+            background-color: var(--background-color);
+            color: var(--text-color);
+            line-height: 1.6;
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #4a6fa5, #90bafc);
-            color: #333;
         }
+
         .container {
-            width: 100%;
-            max-width: 450px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
+            max-width: 500px;
+            padding: 20px;
+            margin: 0 auto;
         }
-        .container:hover {
-            transform: translateY(-5px);
+
+        .card {
+            background-color: var(--card-background);
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+            padding: 30px;
+            margin-bottom: 20px;
         }
+
         h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #4a6fa5;
+            color: var(--primary-color);
+            margin-bottom: 20px;
             font-weight: 600;
+            text-align: center;
         }
-        .input-box {
-            position: relative;
-            margin-bottom: 25px;
+
+        .form-group {
+            margin-bottom: 15px;
         }
-        .input-box input {
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        input {
             width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
             font-size: 16px;
+        }
+
+        input:focus {
             outline: none;
-            transition: border-color 0.3s ease;
+            border-color: var(--primary-color);
         }
-        .input-box input:focus {
-            border-color: #4a6fa5;
-        }
-        .input-box label {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: #999;
-            font-size: 16px;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-        .input-box input:focus + label,
-        .input-box input:not(:placeholder-shown) + label {
-            top: -10px;
-            left: 10px;
-            font-size: 12px;
-            color: #4a6fa5;
-            background: white;
-            padding: 0 5px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #4a6fa5;
-            color: white;
+
+        .btn {
+            padding: 10px 15px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: background 0.3s ease;
+            font-weight: 500;
+            transition: background-color 0.3s;
+            width: 100%;
         }
-        button:hover {
-            background: #3a5a89;
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
         }
-        p {
+
+        .btn-primary:hover {
+            background-color: var(--secondary-color);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .btn-outline:hover {
+            background-color: rgba(74, 111, 165, 0.1);
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .toggle-link {
             text-align: center;
             margin-top: 20px;
-            font-size: 14px;
         }
-        a {
-            color: #4a6fa5;
+
+        .toggle-link a {
+            color: var(--primary-color);
             text-decoration: none;
             font-weight: 500;
         }
-        a:hover {
+
+        .toggle-link a:hover {
             text-decoration: underline;
         }
+
         .error-message {
-            text-align: center;
-            background: #f8d7da;
-            padding: 15px;
-            border-radius: 8px;
+            background-color: #f8d7da;
             color: #721c24;
-            margin-bottom: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            text-align: center;
             display: none;
         }
-        .ineligible-message {
+
+        .ineligible-section {
             text-align: center;
-            background: #f8d7da;
+            background-color: #f8d7da;
             padding: 15px;
             border-radius: 8px;
             color: #721c24;
-            display: inline-block;
+            margin-top: 20px;
         }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+            transition: color 0.3s;
+        }
+
+        .modal-close:hover {
+            color: var(--danger-color);
+        }
+
         .hidden {
             display: none;
+        }
+
+        .toast {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background-color: white;
+            color: var(--text-color);
+            padding: 15px 20px;
+            border-radius: 5px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transform: translateY(100px);
+            opacity: 0;
+            transition: all 0.3s;
+        }
+
+        .toast.active {
+            transform: translateY(0);
+            opacity: 1;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        .toast i {
+            font-size: 20px;
+        }
+
+        .toast.success i {
+            color: var(--success-color);
+        }
+
+        .toast.error i {
+            color: var(--danger-color);
         }
     </style>
 </head>
 <body>
     <div class="container">
         <div id="auth-section">
-            <div id="error-message" class="error-message"></div>
             <div id="login-form">
-                <h2>Login</h2>
-                <div class="input-box">
-                    <input type="email" id="login-email" placeholder=" " required>
-                    <label>Email</label>
+                <div class="card">
+                    <h2>Login</h2>
+                    <div id="login-error" class="error-message"></div>
+                    <form id="login-form-element">
+                        <div class="form-group">
+                            <label for="login-email">Email</label>
+                            <input type="email" id="login-email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="login-password">Password</label>
+                            <input type="password" id="login-password" placeholder="Enter your password" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Login</button>
+                        </div>
+                    </form>
+                    <div class="toggle-link">
+                        <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
+                    </div>
                 </div>
-                <div class="input-box">
-                    <input type="password" id="login-password" placeholder=" " required>
-                    <label>Password</label>
-                </div>
-                <button id="login-btn">Login</button>
-                <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
             </div>
             <div id="register-form" class="hidden">
-                <h2>Register</h2>
-                <div class="input-box">
-                    <input type="text" id="register-username" placeholder=" " required>
-                    <label>Username</label>
+                <div class="card">
+                    <h2>Register</h2>
+                    <div id="register-error" class="error-message"></div>
+                    <form id="register-form-element">
+                        <div class="form-group">
+                            <label for="register-username">Username</label>
+                            <input type="text" id="register-username" placeholder="Enter your username" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-email">Email</label>
+                            <input type="email" id="register-email" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-birthdate">Birthdate</label>
+                            <input type="date" id="register-birthdate" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-password">Password</label>
+                            <input type="password" id="register-password" placeholder="Enter your password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="register-confirm-password">Confirm Password</label>
+                            <input type="password" id="register-confirm-password" placeholder="Confirm your password" required>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Register</button>
+                        </div>
+                    </form>
+                    <div class="toggle-link">
+                        <p>Already have an account? <a href="#" id="show-login">Login</a></p>
+                    </div>
                 </div>
-                <div class="input-box">
-                    <input type="email" id="register-email" placeholder=" " required>
-                    <label>Email</label>
-                </div>
-                <div class="input-box">
-                    <input type="date" id="register-birthdate" placeholder=" " required>
-                    <label>Birthdate</label>
-                </div>
-                <div class="input-box">
-                    <input type="password" id="register-password" placeholder=" " required>
-                    <label>Password</label>
-                </div>
-                <div class="input-box">
-                    <input type="password" id="register-confirm-password" placeholder=" " required>
-                    <label>Confirm Password</label>
-                </div>
-                <button id="register-btn">Register</button>
-                <p>Already have an account? <a href="#" id="show-login">Login</a></p>
-            </div>
-            <div id="pin-verification-form" class="hidden">
-                <h2>Verify Email</h2>
-                <p>Enter the 6-digit PIN sent to your email.</p>
-                <div class="input-box">
-                    <input type="text" id="pin-input" placeholder=" " required>
-                    <label>PIN</label>
-                </div>
-                <button id="verify-pin-btn">Verify</button>
             </div>
         </div>
         <div id="ineligible-section" class="hidden">
-            <div class="ineligible-message">Ineligible authority level</div>
-            <button id="logout-ineligible" style="margin-top: 20px;">Logout</button>
+            <div class="card">
+                <div class="ineligible-section">
+                    <p>Ineligible authority level</p>
+                </div>
+                <div class="form-actions">
+                    <button id="logout-btn" class="btn btn-outline">Logout</button>
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- PIN Verification Modal -->
+    <div class="modal-overlay" id="pin-verification-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Verify Email</h2>
+                <button class="modal-close" id="close-pin-modal">×</button>
+            </div>
+            <form id="pin-verification-form">
+                <div class="form-group">
+                    <label for="pin-input">Enter the 6-digit PIN sent to your email</label>
+                    <input type="text" id="pin-input" placeholder="Enter PIN" required>
+                </div>
+                <div id="pin-error" class="error-message"></div>
+                <div class="form-actions">
+                    <button type="button" class="btn btn-outline" id="cancel-pin">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Verify</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toast-message">Operation successful!</span>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
-        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+        import { getDatabase, ref, push, get, set, update, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
 
-        // Firebase configuration from the provided code
+        // Firebase configuration from the original code
         const firebaseConfig = {
             apiKey: "AIzaSyAjBbnm8F76BCb9C5fluUyoZ2QnMSXlHOo",
             authDomain: "test-c7bf3.firebaseapp.com",
@@ -198,18 +371,25 @@
 
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
-        const auth = getAuth(app);
         const database = getDatabase(app);
 
         // DOM Elements
         const authSection = document.getElementById('auth-section');
         const loginForm = document.getElementById('login-form');
+        const loginFormElement = document.getElementById('login-form-element');
         const registerForm = document.getElementById('register-form');
+        const registerFormElement = document.getElementById('register-form-element');
+        const pinModal = document.getElementById('pin-verification-modal');
         const pinForm = document.getElementById('pin-verification-form');
         const ineligibleSection = document.getElementById('ineligible-section');
-        const errorMessage = document.getElementById('error-message');
+        const loginError = document.getElementById('login-error');
+        const registerError = document.getElementById('register-error');
+        const pinError = document.getElementById('pin-error');
+        const toast = document.getElementById('toast');
+        const toastMessage = document.getElementById('toast-message');
 
         // State
+        let currentUserId = null;
         let tempPin = null;
         let registrationData = null;
 
@@ -217,14 +397,34 @@
         function showSection(section) {
             [authSection, ineligibleSection].forEach(s => s.classList.add('hidden'));
             section.classList.remove('hidden');
-            [loginForm, registerForm, pinForm].forEach(f => f.classList.add('hidden'));
+            [loginForm, registerForm].forEach(f => f.classList.add('hidden'));
             if (section === authSection) loginForm.classList.remove('hidden');
         }
 
-        function showError(message) {
-            errorMessage.textContent = message;
-            errorMessage.style.display = 'block';
-            setTimeout(() => errorMessage.style.display = 'none', 3000);
+        function showToast(message, type = 'success') {
+            toastMessage.textContent = message;
+            toast.className = `toast ${type}`;
+            const icon = toast.querySelector('i');
+            icon.className = type === 'success' ? 'fas fa-check-circle' : 'fas fa-times-circle';
+            toast.classList.add('active');
+            setTimeout(() => toast.classList.remove('active'), 3000);
+        }
+
+        function showError(element, message) {
+            element.textContent = message;
+            element.style.display = 'block';
+            setTimeout(() => element.style.display = 'none', 3000);
+        }
+
+        // Simple password hashing (for demo purposes)
+        function hashPassword(password) {
+            let hash = 0;
+            for (let i = 0; i < password.length; i++) {
+                const char = password.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash;
+            }
+            return hash.toString();
         }
 
         // Toggle Forms
@@ -241,7 +441,8 @@
         });
 
         // Register
-        document.getElementById('register-btn').addEventListener('click', async () => {
+        registerFormElement.addEventListener('submit', async e => {
+            e.preventDefault();
             const username = document.getElementById('register-username').value.trim();
             const email = document.getElementById('register-email').value.trim();
             const birthdate = document.getElementById('register-birthdate').value;
@@ -250,113 +451,173 @@
 
             // Validation
             if (!username || !email || !birthdate || !password || !confirmPassword) {
-                showError('All fields are required');
-                return;
-            }
-            if (password !== confirmPassword) {
-                showError('Passwords do not match');
-                return;
-            }
-            if (password.length < 6) {
-                showError('Password must be at least 6 characters');
-                return;
-            }
-            if (!/\S+@\S+\.\S+/.test(email)) {
-                showError('Invalid email format');
+                showError(registerError, 'All fields are required');
                 return;
             }
             if (username.length < 3) {
-                showError('Username must be at least 3 characters');
+                showError(registerError, 'Username must be at least 3 characters');
+                return;
+            }
+            if (!/\S+@\S+\.\S+/.test(email)) {
+                showError(registerError, 'Invalid email format');
                 return;
             }
             const birthDateObj = new Date(birthdate);
             const today = new Date();
             if (birthDateObj >= today) {
-                showError('Birthdate must be in the past');
+                showError(registerError, 'Birthdate must be in the past');
+                return;
+            }
+            if (password.length < 6) {
+                showError(registerError, 'Password must be at least 6 characters');
+                return;
+            }
+            if (password !== confirmPassword) {
+                showError(registerError, 'Passwords do not match');
                 return;
             }
 
-            // Simulate email verification
-            tempPin = Math.floor(100000 + Math.random() * 900000).toString();
-            alert(`Your PIN is ${tempPin}. Enter it to verify your email (simulated).`);
-            registrationData = { username, email, birthdate, password };
-            registerForm.classList.add('hidden');
-            pinForm.classList.remove('hidden');
+            try {
+                // Check if email or username exists
+                const usersRef = ref(database, 'users');
+                const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
+                const usernameQuery = query(usersRef, orderByChild('username'), equalTo(username));
+                const [emailSnapshot, usernameSnapshot] = await Promise.all([get(emailQuery), get(usernameQuery)]);
+                if (emailSnapshot.exists()) {
+                    showError(registerError, 'Email already registered');
+                    return;
+                }
+                if (usernameSnapshot.exists()) {
+                    showError(registerError, 'Username already taken');
+                    return;
+                }
+
+                // Generate PIN and show modal
+                tempPin = Math.floor(100000 + Math.random() * 900000).toString();
+                alert(`Your PIN is ${tempPin}. Enter it to verify your email (simulated).`);
+                registrationData = { username, email, birthdate, password: hashPassword(password) };
+                pinModal.classList.add('active');
+                document.getElementById('pin-input').focus();
+            } catch (error) {
+                showError(registerError, 'Registration error: ' + error.message);
+            }
         });
 
-        // Verify PIN
-        document.getElementById('verify-pin-btn').addEventListener('click', async () => {
+        // PIN Verification
+        pinForm.addEventListener('submit', async e => {
+            e.preventDefault();
             const enteredPin = document.getElementById('pin-input').value.trim();
             if (enteredPin === tempPin) {
-                const { username, email, birthdate, password } = registrationData;
                 try {
                     const usersRef = ref(database, 'users');
                     const snapshot = await get(usersRef);
                     const userCount = snapshot.exists() ? snapshot.numChildren() : 0;
                     const authority = userCount === 0 ? 0 : 7;
 
-                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                    const user = userCredential.user;
-
-                    await set(ref(database, 'users/' + user.uid), {
-                        username,
-                        email,
-                        birthdate,
+                    const newUserRef = push(usersRef);
+                    await set(newUserRef, {
+                        username: registrationData.username,
+                        email: registrationData.email,
+                        birthdate: registrationData.birthdate,
+                        password: registrationData.password,
                         authority,
                         createdAt: new Date().toISOString()
                     });
 
-                    tempPin = null;
-                    registrationData = null;
-                    pinForm.classList.add('hidden');
+                    showToast('Account created successfully!', 'success');
+                    pinModal.classList.remove('active');
+                    pinForm.reset();
+                    currentUserId = newUserRef.key;
+                    checkAuthorityAndRedirect();
                 } catch (error) {
-                    showError('Registration failed: ' + error.message);
+                    showError(pinError, 'Failed to create account: ' + error.message);
                 }
             } else {
-                showError('Incorrect PIN');
+                showError(pinError, 'Incorrect PIN');
             }
         });
 
+        document.getElementById('close-pin-modal').addEventListener('click', () => {
+            pinModal.classList.remove('active');
+            pinForm.reset();
+        });
+
+        document.getElementById('cancel-pin').addEventListener('click', () => {
+            pinModal.classList.remove('active');
+            pinForm.reset();
+        });
+
         // Login
-        document.getElementById('login-btn').addEventListener('click', async () => {
+        loginFormElement.addEventListener('submit', async e => {
+            e.preventDefault();
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
 
             if (!email || !password) {
-                showError('Email and password are required');
+                showError(loginError, 'Email and password are required');
                 return;
             }
 
             try {
-                await signInWithEmailAndPassword(auth, email, password);
+                const usersRef = ref(database, 'users');
+                const emailQuery = query(usersRef, orderByChild('email'), equalTo(email));
+                const snapshot = await get(emailQuery);
+                if (!snapshot.exists()) {
+                    showError(loginError, 'Email not found');
+                    return;
+                }
+
+                let userId = null;
+                let userData = null;
+                snapshot.forEach(child => {
+                    if (child.val().password === hashPassword(password)) {
+                        userId = child.key;
+                        userData = child.val();
+                    }
+                });
+
+                if (!userId) {
+                    showError(loginError, 'Incorrect password');
+                    return;
+                }
+
+                currentUserId = userId;
+                checkAuthorityAndRedirect();
             } catch (error) {
-                showError('Login failed: ' + error.message);
+                showError(loginError, 'Login failed: ' + error.message);
             }
         });
 
         // Logout
-        document.getElementById('logout-ineligible').addEventListener('click', () => signOut(auth));
+        document.getElementById('logout-btn').addEventListener('click', () => {
+            currentUserId = null;
+            showSection(authSection);
+            showToast('Logged out successfully', 'success');
+        });
 
-        // Auth State Listener
-        onAuthStateChanged(auth, user => {
-            if (user) {
-                get(ref(database, 'users/' + user.uid)).then(snapshot => {
+        // Check Authority and Redirect
+        async function checkAuthorityAndRedirect() {
+            try {
+                const userRef = ref(database, `users/${currentUserId}`);
+                const snapshot = await get(userRef);
+                if (snapshot.exists()) {
                     const userData = snapshot.val();
-                    if (userData) {
-                        if (userData.authority === 0) {
-                            window.location.href = 'kilostone.html';
-                        } else {
-                            showSection(ineligibleSection);
-                        }
+                    if (userData.authority === 0) {
+                        window.location.href = 'kilostone.html';
+                    } else {
+                        showSection(ineligibleSection);
                     }
-                }).catch(error => {
-                    showError('Failed to fetch user data: ' + error.message);
-                    signOut(auth);
-                });
-            } else {
+                } else {
+                    showToast('User data not found', 'error');
+                    currentUserId = null;
+                    showSection(authSection);
+                }
+            } catch (error) {
+                showToast('Error checking authority: ' + error.message, 'error');
+                currentUserId = null;
                 showSection(authSection);
             }
-        });
+        }
     </script>
 </body>
 </html>
