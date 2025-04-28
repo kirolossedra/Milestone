@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login / Register</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -16,7 +17,7 @@
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            background: linear-gradient(135deg, #4203a9, #90bafc);
+            background: linear-gradient(135deg, #4a6fa5, #90bafc);
             color: #333;
         }
         .container {
@@ -34,7 +35,7 @@
         h2 {
             text-align: center;
             margin-bottom: 30px;
-            color: #4203a9;
+            color: #4a6fa5;
             font-weight: 600;
         }
         .input-box {
@@ -51,7 +52,7 @@
             transition: border-color 0.3s ease;
         }
         .input-box input:focus {
-            border-color: #4203a9;
+            border-color: #4a6fa5;
         }
         .input-box label {
             position: absolute;
@@ -68,14 +69,14 @@
             top: -10px;
             left: 10px;
             font-size: 12px;
-            color: #4203a9;
+            color: #4a6fa5;
             background: white;
             padding: 0 5px;
         }
         button {
             width: 100%;
             padding: 12px;
-            background: #4203a9;
+            background: #4a6fa5;
             color: white;
             border: none;
             border-radius: 8px;
@@ -84,7 +85,7 @@
             transition: background 0.3s ease;
         }
         button:hover {
-            background: #35028c;
+            background: #3a5a89;
         }
         p {
             text-align: center;
@@ -92,17 +93,24 @@
             font-size: 14px;
         }
         a {
-            color: #4203a9;
+            color: #4a6fa5;
             text-decoration: none;
             font-weight: 500;
         }
         a:hover {
             text-decoration: underline;
         }
-        #main-content, #ineligible-message {
+        .error-message {
             text-align: center;
+            background: #f8d7da;
+            padding: 15px;
+            border-radius: 8px;
+            color: #721c24;
+            margin-bottom: 20px;
+            display: none;
         }
-        #ineligible-message p {
+        .ineligible-message {
+            text-align: center;
             background: #f8d7da;
             padding: 15px;
             border-radius: 8px;
@@ -113,13 +121,11 @@
             display: none;
         }
     </style>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
 </head>
 <body>
     <div class="container">
         <div id="auth-section">
+            <div id="error-message" class="error-message"></div>
             <div id="login-form">
                 <h2>Login</h2>
                 <div class="input-box">
@@ -168,70 +174,58 @@
                 <button id="verify-pin-btn">Verify</button>
             </div>
         </div>
-        <div id="main-content" class="hidden">
-            <h2>Welcome to Kilostone</h2>
-            <p>You have successfully logged in!</p>
-            <button id="change-authority" class="hidden">Change Authority</button>
-            <button id="logout">Logout</button>
-        </div>
-        <div id="ineligible-message" class="hidden">
-            <p>Ineligible authority level</p>
-            <button id="logout-ineligible">Logout</button>
+        <div id="ineligible-section" class="hidden">
+            <div class="ineligible-message">Ineligible authority level</div>
+            <button id="logout-ineligible" style="margin-top: 20px;">Logout</button>
         </div>
     </div>
-    <script>
-        // Replace with your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "YOUR_API_KEY",
-            authDomain: "YOUR_AUTH_DOMAIN",
-            databaseURL: "https://YOUR_PROJECT_ID.firebaseio.com",
-            projectId: "YOUR_PROJECT_ID",
-            storageBucket: "YOUR_STORAGE_BUCKET",
-            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-            appId: "YOUR_APP_ID"
-        };
-        firebase.initializeApp(firebaseConfig);
-        const auth = firebase.auth();
-        const database = firebase.database();
 
-        let tempPin = null;
-        let registrationData = null;
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+
+        // Firebase configuration from the provided code
+        const firebaseConfig = {
+            apiKey: "AIzaSyAjBbnm8F76BCb9C5fluUyoZ2QnMSXlHOo",
+            authDomain: "test-c7bf3.firebaseapp.com",
+            databaseURL: "https://test-c7bf3-default-rtdb.firebaseio.com",
+            projectId: "test-c7bf3",
+            storageBucket: "test-c7bf3.firebasestorage.app",
+            messagingSenderId: "573697013702",
+            appId: "1:573697013702:web:fe132fc4d796c06bdbe4c7"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
 
         // DOM Elements
         const authSection = document.getElementById('auth-section');
         const loginForm = document.getElementById('login-form');
         const registerForm = document.getElementById('register-form');
         const pinForm = document.getElementById('pin-verification-form');
-        const mainContent = document.getElementById('main-content');
-        const ineligibleMessage = document.getElementById('ineligible-message');
-        const changeAuthorityBtn = document.getElementById('change-authority');
+        const ineligibleSection = document.getElementById('ineligible-section');
+        const errorMessage = document.getElementById('error-message');
+
+        // State
+        let tempPin = null;
+        let registrationData = null;
 
         // Utility Functions
         function showSection(section) {
-            [authSection, mainContent, ineligibleMessage].forEach(s => s.classList.add('hidden'));
+            [authSection, ineligibleSection].forEach(s => s.classList.add('hidden'));
             section.classList.remove('hidden');
             [loginForm, registerForm, pinForm].forEach(f => f.classList.add('hidden'));
             if (section === authSection) loginForm.classList.remove('hidden');
         }
 
-        // Auth State Listener
-        auth.onAuthStateChanged(user => {
-            if (user) {
-                database.ref('users/' + user.uid).once('value', snapshot => {
-                    const userData = snapshot.val();
-                    if (userData) {
-                        if (userData.authority === 0) {
-                            showSection(mainContent);
-                            changeAuthorityBtn.classList.remove('hidden');
-                        } else {
-                            showSection(ineligibleMessage);
-                        }
-                    }
-                });
-            } else {
-                showSection(authSection);
-            }
-        });
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            setTimeout(() => errorMessage.style.display = 'none', 3000);
+        }
 
         // Toggle Forms
         document.getElementById('show-register').addEventListener('click', e => {
@@ -247,30 +241,42 @@
         });
 
         // Register
-        document.getElementById('register-btn').addEventListener('click', () => {
+        document.getElementById('register-btn').addEventListener('click', async () => {
             const username = document.getElementById('register-username').value.trim();
             const email = document.getElementById('register-email').value.trim();
             const birthdate = document.getElementById('register-birthdate').value;
             const password = document.getElementById('register-password').value;
             const confirmPassword = document.getElementById('register-confirm-password').value;
 
-            if (!username || !email || !birthdate || !password) {
-                alert('All fields are required');
+            // Validation
+            if (!username || !email || !birthdate || !password || !confirmPassword) {
+                showError('All fields are required');
                 return;
             }
             if (password !== confirmPassword) {
-                alert('Passwords do not match');
+                showError('Passwords do not match');
                 return;
             }
             if (password.length < 6) {
-                alert('Password must be at least 6 characters');
+                showError('Password must be at least 6 characters');
                 return;
             }
             if (!/\S+@\S+\.\S+/.test(email)) {
-                alert('Invalid email format');
+                showError('Invalid email format');
+                return;
+            }
+            if (username.length < 3) {
+                showError('Username must be at least 3 characters');
+                return;
+            }
+            const birthDateObj = new Date(birthdate);
+            const today = new Date();
+            if (birthDateObj >= today) {
+                showError('Birthdate must be in the past');
                 return;
             }
 
+            // Simulate email verification
             tempPin = Math.floor(100000 + Math.random() * 900000).toString();
             alert(`Your PIN is ${tempPin}. Enter it to verify your email (simulated).`);
             registrationData = { username, email, birthdate, password };
@@ -279,52 +285,77 @@
         });
 
         // Verify PIN
-        document.getElementById('verify-pin-btn').addEventListener('click', () => {
+        document.getElementById('verify-pin-btn').addEventListener('click', async () => {
             const enteredPin = document.getElementById('pin-input').value.trim();
             if (enteredPin === tempPin) {
                 const { username, email, birthdate, password } = registrationData;
-                database.ref('users').once('value', snapshot => {
-                    const userCount = snapshot.numChildren();
+                try {
+                    const usersRef = ref(database, 'users');
+                    const snapshot = await get(usersRef);
+                    const userCount = snapshot.exists() ? snapshot.numChildren() : 0;
                     const authority = userCount === 0 ? 0 : 7;
-                    auth.createUserWithEmailAndPassword(email, password)
-                        .then(userCredential => {
-                            const user = userCredential.user;
-                            database.ref('users/' + user.uid).set({
-                                username,
-                                email,
-                                birthdate,
-                                authority
-                            });
-                            tempPin = null;
-                            registrationData = null;
-                            pinForm.classList.add('hidden');
-                        })
-                        .catch(error => {
-                            alert('Registration failed: ' + error.message);
-                        });
-                });
+
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+
+                    await set(ref(database, 'users/' + user.uid), {
+                        username,
+                        email,
+                        birthdate,
+                        authority,
+                        createdAt: new Date().toISOString()
+                    });
+
+                    tempPin = null;
+                    registrationData = null;
+                    pinForm.classList.add('hidden');
+                } catch (error) {
+                    showError('Registration failed: ' + error.message);
+                }
             } else {
-                alert('Incorrect PIN');
+                showError('Incorrect PIN');
             }
         });
 
         // Login
-        document.getElementById('login-btn').addEventListener('click', () => {
+        document.getElementById('login-btn').addEventListener('click', async () => {
             const email = document.getElementById('login-email').value.trim();
             const password = document.getElementById('login-password').value;
-            auth.signInWithEmailAndPassword(email, password)
-                .catch(error => {
-                    alert('Login failed: ' + error.message);
-                });
+
+            if (!email || !password) {
+                showError('Email and password are required');
+                return;
+            }
+
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                showError('Login failed: ' + error.message);
+            }
         });
 
         // Logout
-        document.getElementById('logout').addEventListener('click', () => auth.signOut());
-        document.getElementById('logout-ineligible').addEventListener('click', () => auth.signOut());
+        document.getElementById('logout-ineligible').addEventListener('click', () => signOut(auth));
 
-        // Change Authority (Placeholder)
-        document.getElementById('change-authority').addEventListener('click', () => {
-            alert('Authority management feature coming soon');
+        // Auth State Listener
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                get(ref(database, 'users/' + user.uid)).then(snapshot => {
+                    const userData = snapshot.val();
+                    if (userData) {
+                        if (userData.authority === 0) {
+                            window.location.href = 'kilostone.html';
+                        } else {
+                            showSection(ineligibleSection);
+                        }
+                    }
+                }).catch(error => {
+                    showError('Failed to fetch user data: ' + error.message);
+                    signOut(auth);
+                });
+            } else {
+                showSection(authSection);
+            }
         });
     </script>
 </body>
