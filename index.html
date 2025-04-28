@@ -1,279 +1,265 @@
+<!--  EVERYTHING below is the complete page — just paste & run  -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login / Register</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        body {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            background: linear-gradient(135deg, #4a6fa5, #90bafc);
-            color: #333;
-        }
-        .container {
-            width: 100%;
-            max-width: 450px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-        }
-        .container:hover {
-            transform: translateY(-5px);
-        }
-        h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: #4a6fa5;
-            font-weight: 600;
-        }
-        .input-box {
-            position: relative;
-            margin-bottom: 25px;
-        }
-        .input-box input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            font-size: 16px;
-            outline: none;
-            transition: border-color 0.3s ease;
-        }
-        .input-box input:focus {
-            border-color: #4a6fa5;
-        }
-        .input-box label {
-            position: absolute;
-            top: 50%;
-            left: 15px;
-            transform: translateY(-50%);
-            color: #999;
-            font-size: 16px;
-            pointer-events: none;
-            transition: all 0.3s ease;
-        }
-        .input-box input:focus + label,
-        .input-box input:not(:placeholder-shown) + label {
-            top: -10px;
-            left: 10px;
-            font-size: 12px;
-            color: #4a6fa5;
-            background: white;
-            padding: 0 5px;
-        }
-        button {
-            width: 100%;
-            padding: 12px;
-            background: #4a6fa5;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        button:hover {
-            background: #3a5a89;
-        }
-        p {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 14px;
-        }
-        a {
-            color: #4a6fa5;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
-        .message {
-            text-align: center;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            display: none;
-        }
-        .error {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        .success {
-            background: #d4edda;
-            color: #155724;
-        }
-        .hidden {
-            display: none;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login / Register – DB-only + Authority</title>
+
+  <!-- Google-fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ───────  base look  ─────── */
+    *{margin:0;padding:0;box-sizing:border-box;font-family:'Poppins',sans-serif}
+    body{display:flex;justify-content:center;align-items:center;min-height:100vh;
+         background:linear-gradient(135deg,#4a6fa5,#90bafc);color:#333;padding:24px}
+    .container{width:100%;max-width:450px;background:rgba(255,255,255,.95);border-radius:15px;
+               padding:40px;box-shadow:0 10px 30px rgba(0,0,0,.2);transition:transform .3s ease}
+    .container:hover{transform:translateY(-5px)}
+    h2{text-align:center;margin-bottom:30px;color:#4a6fa5;font-weight:600}
+
+    /* ───────  floating labels  ─────── */
+    .input-box{position:relative;margin-bottom:25px}
+    .input-box input{
+      width:100%;padding:12px 15px;border:2px solid #ddd;border-radius:8px;
+      font-size:16px;outline:none;transition:border-color .3s ease
+    }
+    .input-box input:focus{border-color:#4a6fa5}
+    .input-box label{
+      position:absolute;top:50%;left:15px;transform:translateY(-50%);
+      color:#999;font-size:16px;pointer-events:none;transition:all .3s ease
+    }
+    .input-box input:focus+label,
+    .input-box input:not(:placeholder-shown)+label{
+      top:-10px;left:10px;font-size:12px;color:#4a6fa5;background:#fff;padding:0 5px
+    }
+
+    /* ───────  buttons & links  ─────── */
+    button{
+      width:100%;padding:12px;background:#4a6fa5;color:#fff;border:none;border-radius:8px;
+      font-size:16px;cursor:pointer;transition:background .3s ease;margin-top:10px
+    }
+    button:hover{background:#3a5a89}
+    p{text-align:center;margin-top:20px;font-size:14px}
+    a{color:#4a6fa5;text-decoration:none;font-weight:500}
+    a:hover{text-decoration:underline}
+
+    /* ───────  messages  ─────── */
+    .error-message,.success-message{
+      text-align:center;padding:15px;border-radius:8px;margin-bottom:20px;display:none
+    }
+    .error-message{background:#f8d7da;color:#721c24}
+    .success-message{background:#d4edda;color:#155724}
+
+    .hidden{display:none}
+
+    /* ineligible block */
+    #ineligibleSection{text-align:center}
+    #ineligibleSection div{
+      background:#f8d7da;color:#721c24;padding:20px;border-radius:8px;margin-bottom:20px
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div id="auth-section">
-            <div id="login-message" class="message"></div>
-            <div id="register-message" class="message"></div>
-            
-            <div id="login-form">
-                <h2>Login</h2>
-                <div class="input-box">
-                    <input type="email" id="login-email" placeholder=" " required>
-                    <label>Email</label>
-                </div>
-                <div class="input-box">
-                    <input type="password" id="login-password" placeholder=" " required>
-                    <label>Password</label>
-                </div>
-                <button type="submit" id="login-btn">Login</button>
-                <p>Don't have an account? <a href="#" id="show-register">Register</a></p>
-            </div>
 
-            <div id="register-form" class="hidden">
-                <h2>Register</h2>
-                <div class="input-box">
-                    <input type="email" id="register-email" placeholder=" " required>
-                    <label>Email</label>
-                </div>
-                <div class="input-box">
-                    <input type="password" id="register-password" placeholder=" " required>
-                    <label>Password</label>
-                </div>
-                <button type="submit" id="register-btn">Register</button>
-                <p>Already have an account? <a href="#" id="show-login">Login</a></p>
-            </div>
-        </div>
+  <div class="container">
+
+    <!-- ──────────  REGISTER  ────────── -->
+    <div id="registerCard">
+      <h2>Create Account</h2>
+
+      <div class="input-box">
+        <input id="regUsername" type="text" placeholder=" " autocomplete="off">
+        <label>Username</label>
+      </div>
+
+      <div class="input-box">
+        <input id="regEmail" type="email" placeholder=" " autocomplete="off">
+        <label>Email</label>
+      </div>
+
+      <div class="input-box">
+        <input id="regBirth" type="date" placeholder=" ">
+        <label>Birth date</label>
+      </div>
+
+      <div class="input-box">
+        <input id="regPassword" type="password" placeholder=" " autocomplete="new-password">
+        <label>Password</label>
+      </div>
+
+      <div class="input-box">
+        <input id="regConfirm" type="password" placeholder=" ">
+        <label>Confirm password</label>
+      </div>
+
+      <button id="registerBtn">Sign Up</button>
+      <div class="error-message"   id="regError"></div>
+      <div class="success-message" id="regSuccess"></div>
+
+      <p>Already have an account? <a href="#" onclick="swap('login')">Log in</a></p>
     </div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getDatabase, ref, push, get, set, query, orderByChild, equalTo } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-database.js";
+    <!-- ──────────  LOGIN  ────────── -->
+    <div id="loginCard" class="hidden">
+      <h2>Welcome Back</h2>
 
-        // Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyAjBbnm8F76BCb9C5fluUyoZ2QnMSXlHOo",
-            authDomain: "test-c7bf3.firebaseapp.com",
-            databaseURL: "https://test-c7bf3-default-rtdb.firebaseio.com",
-            projectId: "test-c7bf3",
-            storageBucket: "test-c7bf3.firebasestorage.app",
-            messagingSenderId: "573697013702",
-            appId: "1:573697013702:web:fe132fc4d796c06bdbe4c7"
-        };
-        
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
+      <div class="input-box">
+        <input id="logUsername" type="text" placeholder=" " autocomplete="off">
+        <label>Username</label>
+      </div>
 
-        // DOM Elements
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        const loginMessage = document.getElementById('login-message');
-        const registerMessage = document.getElementById('register-message');
+      <div class="input-box">
+        <input id="logPassword" type="password" placeholder=" " autocomplete="current-password">
+        <label>Password</label>
+      </div>
 
-        // Form Toggle
-        document.getElementById('show-register').addEventListener('click', (e) => {
-            e.preventDefault();
-            loginForm.classList.add('hidden');
-            registerForm.classList.remove('hidden');
-            clearMessages();
-        });
+      <button id="loginBtn">Log In</button>
+      <div class="error-message"   id="logError"></div>
+      <div class="success-message" id="logSuccess"></div>
 
-        document.getElementById('show-login').addEventListener('click', (e) => {
-            e.preventDefault();
-            registerForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
-            clearMessages();
-        });
+      <p>Need an account? <a href="#" onclick="swap('register')">Sign up</a></p>
+    </div>
 
-        function clearMessages() {
-            loginMessage.style.display = 'none';
-            registerMessage.style.display = 'none';
+    <!-- ──────────  INELIGIBLE  ────────── -->
+    <div id="ineligibleSection" class="hidden">
+      <div>Ineligible authority level</div>
+      <button id="logoutBtn">Logout</button>
+    </div>
+
+  </div>
+
+  <script type="module">
+    /* ─────────────────────────────────────────
+       Firebase (v10) initialisation
+    ───────────────────────────────────────── */
+    import { initializeApp }      from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getDatabase, ref, set, get, child }
+           from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+    const firebaseConfig = {
+      apiKey:            "AIzaSyC6sAqOZgVLKzuAcCAwZFl8BKAZQXiZCEk",
+      authDomain:        "the-human-project-9e969.firebaseapp.com",
+      databaseURL:       "https://the-human-project-9e969-default-rtdb.firebaseio.com",
+      projectId:         "the-human-project-9e969",
+      storageBucket:     "the-human-project-9e969.firebasestorage.app",
+      messagingSenderId: "135618599099",
+      appId:             "1:135618599099:web:5a687730ce1227b4ee719e"
+    };
+
+    const app  = initializeApp(firebaseConfig);
+    const db   = getDatabase(app);
+    const root = ref(db,"users");                 // users/{username}
+
+    /* ─────────────────  UI helpers  ───────────────── */
+    const hideAllMsgs = () => {
+      [regError, regSuccess, logError, logSuccess]
+        .forEach(el => { el.style.display="none"; el.textContent=""; });
+    };
+    window.swap = (card) => {
+      hideAllMsgs();
+      ineligibleSection.classList.add("hidden");
+      if (card==="login"){
+        registerCard.classList.add("hidden");
+        loginCard.classList.remove("hidden");
+      } else {
+        loginCard.classList.add("hidden");
+        registerCard.classList.remove("hidden");
+      }
+    };
+    const show = (el,msg) => { el.textContent=msg; el.style.display="block"; };
+
+    /* quick SHA-256 */
+    const sha256 = async txt => Array.from(
+        new Uint8Array(await crypto.subtle.digest("SHA-256",
+                         new TextEncoder().encode(txt))))
+        .map(b=>b.toString(16).padStart(2,"0")).join("");
+
+    /* ─────────────────  REGISTER  ───────────────── */
+    registerBtn.addEventListener("click", async () => {
+      hideAllMsgs();
+
+      const u = regUsername.value.trim();
+      const e = regEmail.value.trim();
+      const b = regBirth.value;
+      const p = regPassword.value;
+      const c = regConfirm.value;
+
+      /* ── field presence ── */
+      if (!u||!e||!b||!p||!c)       return show(regError,"Fill every field.");
+      /* ── username chars ── */
+      if (/[^A-Za-z0-9_.-]/.test(u)) return show(regError,"Username may contain A-Z, a-z, 0-9, _-.");
+      /* 1- email format */
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e))
+          return show(regError,"Invalid email format.");
+      /* 3- password length */
+      if (p.length < 7)
+          return show(regError,"Password must be ≥ 7 characters.");
+      if (p!==c)                    return show(regError,"Passwords don’t match.");
+      if (new Date(b)>=new Date())  return show(regError,"Birth date must be in the past.");
+
+      try{
+        /* username taken? */
+        if ((await get(child(root,u))).exists())
+          throw new Error("Username already taken.");
+
+        /* read whole list once  ➜ authority calc + 2-email uniqueness */
+        const allSnap = await get(root);
+        const users   = allSnap.exists()? allSnap.val() : {};
+        /* 2- email duplicate check (case-insensitive) */
+        for (const k in users){
+          if ((users[k].email||"").toLowerCase() === e.toLowerCase())
+            throw new Error("Email is already registered.");
         }
 
-        // Register
-        document.getElementById('register-btn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('register-email').value.trim();
-            const password = document.getElementById('register-password').value;
+        const authority = Object.keys(users).length === 0 ? 0 : 7;
 
-            try {
-                const usersRef = ref(database, 'users');
-                const snapshot = await get(usersRef);
-                const authority = snapshot.exists() ? snapshot.numChildren() + 1 : 1;
-                const newUserRef = push(usersRef);
-                
-                await set(newUserRef, { 
-                    email, 
-                    password, 
-                    authority, 
-                    createdAt: new Date().toISOString() 
-                });
-
-                registerMessage.textContent = 'Registration successful! You can now login.';
-                registerMessage.className = 'message success';
-                registerMessage.style.display = 'block';
-                registerForm.reset();
-                loginForm.classList.remove('hidden');
-                registerForm.classList.add('hidden');
-            } catch (err) {
-                console.error(err);
-                registerMessage.textContent = 'Registration failed.';
-                registerMessage.className = 'message error';
-                registerMessage.style.display = 'block';
-            }
+        await set(child(root,u),{
+          email     : e,
+          birthdate : b,
+          passHash  : await sha256(p),
+          authority,
+          createdAt : new Date().toISOString()
         });
 
-        // Login
-        document.getElementById('login-btn').addEventListener('click', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('login-email').value.trim();
-            const password = document.getElementById('login-password').value;
+        show(regSuccess,"Account created ✔ — log in!");
+        setTimeout(()=>swap("login"),900);
+      }catch(err){ show(regError,err.message); }
+    });
 
-            loginMessage.textContent = '';
-            loginMessage.style.display = 'none';
+    /* ─────────────────  LOGIN  ───────────────── */
+    loginBtn.addEventListener("click", async () => {
+      hideAllMsgs();
 
-            try {
-                const usersQuery = query(ref(database, 'users'), orderByChild('email'), equalTo(email));
-                const snapshot = await get(usersQuery);
-                let found = false;
+      const u = logUsername.value.trim();
+      const p = logPassword.value;
+      if (!u||!p) return show(logError,"Enter username and password.");
 
-                snapshot.forEach(child => {
-                    const user = child.val();
-                    if (user.password === password) {
-                        found = true;
-                        if (user.authority === 1) {
-                            window.location.href = 'kilostone.html';
-                        } else {
-                            loginMessage.textContent = 'Access denied: insufficient authority level.';
-                            loginMessage.className = 'message error';
-                            loginMessage.style.display = 'block';
-                        }
-                    }
-                });
+      try{
+        const snap = await get(child(root,u));
+        if (!snap.exists()) throw new Error("Username not found.");
 
-                if (!found) {
-                    loginMessage.textContent = 'Login failed: incorrect email or password.';
-                    loginMessage.className = 'message error';
-                    loginMessage.style.display = 'block';
-                }
-            } catch (err) {
-                console.error(err);
-                loginMessage.textContent = 'Login error.';
-                loginMessage.className = 'message error';
-                loginMessage.style.display = 'block';
-            }
-        });
-    </script>
+        const stored    = snap.val();
+        if (await sha256(p) !== stored.passHash)
+          throw new Error("Wrong password.");
+
+        const authority = stored.authority ?? 7;
+
+        show(logSuccess,"Login successful ✔");
+        setTimeout(()=>{
+          if (authority===0){
+            window.location.href="kilostone.html";
+          } else {
+            loginCard.classList.add("hidden");
+            ineligibleSection.classList.remove("hidden");
+          }
+        },700);
+      }catch(err){ show(logError,err.message); }
+    });
+
+    /* ─────────────────  LOGOUT (ineligible)  ───────────────── */
+    logoutBtn.addEventListener("click", () => swap("login"));
+  </script>
 </body>
 </html>
